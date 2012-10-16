@@ -80,7 +80,7 @@ class lnp_Image {
 	 * @param int $position 水印图在图像中的位置
 	 * @param int $alpha 水印质量
 	 */
-	public static function waterMark($src, $waterfile, $postion = 0, $alpha = 100) {
+	public static function waterMark($src, $waterfile, $dst = false, $postion = 9) {
 		$srcinfo = self::getImageSize($src);
 		if (!$srcinfo || !$srcinfo['width'] || !$srcinfo['height'] || !$srcinfo['mime']) {
 			return false;
@@ -145,9 +145,9 @@ class lnp_Image {
 			
 		}
 		
-		self::imageCopyMerge($srcim, $waterim, $x, $y, 0, 0, $waterinfo['width'], $waterinfo['height'], $waterinfo['mime'], $alpha);
+		self::imageCopyMerge($srcim, $waterim, $x, $y, 0, 0, $waterinfo['width'], $waterinfo['height'], $waterinfo['mime'], 100);
 		
-		$return = self::saveImage($srcim, $src, $srcinfo['mime']);
+		$return = self::saveImage($srcim, $dst ? $dst : $src, $srcinfo['mime']);
 		imagedestroy($srcim);
 		imagedestroy($waterim);
 		return $return;
@@ -235,7 +235,8 @@ class lnp_Image {
 		if (!$dst || !$dstim) {
 			return false;
 		}
-		lnpFile::mkdir(dirname($dst));
+		$dir = dirname($dst);
+		is_dir($dir) || mkdir($dir, 0777, true);
 		switch ($mime) {
 		case 'image/gif':
 			$return = imagegif($dstim, $dst);
@@ -260,8 +261,13 @@ class lnp_Image {
 	public function showImage($im, $mime = 'image/jpeg'){
 		header("Content-type: $mime");
 		if(is_string($im)){
-			echo $im;
-			return;
+			if(!is_file($im)) {
+				echo $im;
+				return;
+			}
+			$info = self::getimageSize($im);
+			$im = self::imageCreateFrom($im);
+			$mime = $info['mime'];
 		}
 		
 		switch($mime) {
