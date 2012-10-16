@@ -70,8 +70,8 @@ class lnp_Db_pdo {
 		$this->lastquery = $this->link->query($sql);
 		$this->querycnt++;
 		
-		if(!$this->lastquery || $this->errno() > 0){
-			die($this->error());
+		if($this->lastquery===false || $this->errno() > 0){
+			die(print_r($this->error(), true));
 		}
 		return $this;
 	}
@@ -81,8 +81,8 @@ class lnp_Db_pdo {
 		$result = $this->link->exec($sql);
 		
 		$this->querycnt++;
-		if($this->errno()){
-			die($this->error());
+		if($result===false || $this->errno() > 0){
+			die(print_r($this->error(), true));
 		}
 		return $result;
 	}
