@@ -250,6 +250,20 @@ class lnp_Request {
 		return $ip;
 	}
 	
+	public static function checkRobot(){
+		$agent = self::server('HTTP_USER_AGENT');
+		$robots = array('bot', 'crawl', 'spider' ,'slurp', 'sohu-search', 'lycos', 'robozilla');
+		if($agent){
+			foreach($robots as $k => $v){
+				if(false !== stripos($agent, $v)){
+					return $agent;
+				}
+			}
+			return false;
+		}
+		return false;
+	}
+	
 	
 }
 
